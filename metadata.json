@@ -1,0 +1,5 @@
+{
+  "name": "Internship Pathfinder AI",
+  "description": "An AI-powered assessment tool for Software Engineering students to find their ideal internship role (Frontend, Backend, UX/UI, QA, Project Coordinator) with personalized guidance based on their coursework.",
+  "requestFramePermissions": []
+}
