@@ -25,19 +25,19 @@ import {
 
 interface ResultsProps {
   results: {
-    flash: { pure: AssessmentResult | null; context: AssessmentResult | null };
-    pro: { pure: AssessmentResult | null; context: AssessmentResult | null };
+    openai: { pure: AssessmentResult | null; context: AssessmentResult | null };
+    gemini: { pure: AssessmentResult | null; context: AssessmentResult | null };
   };
   onRestart: () => void;
 }
 
 const Results: React.FC<ResultsProps> = ({ results, onRestart }) => {
   // Level 1 Tab: Model Group
-  const [activeModel, setActiveModel] = useState<'flash' | 'pro'>('flash');
+  const [activeModel, setActiveModel] = useState<'openai' | 'gemini'>('gemini');
   // Level 2 Tab: Data Source Context
   const [activeContext, setActiveContext] = useState<'pure' | 'context'>('pure');
 
-  const modelData = activeModel === 'flash' ? results.flash : results.pro;
+  const modelData = activeModel === 'openai' ? results.openai : results.gemini;
   const currentResult = activeContext === 'pure' ? modelData.pure : modelData.context;
 
   if (!currentResult) return null;
@@ -56,7 +56,7 @@ const Results: React.FC<ResultsProps> = ({ results, onRestart }) => {
   };
 
   const getThemeColor = (type: 'bg' | 'text' | 'border' | 'gradient', intensity: number = 500) => {
-    if (activeModel === 'flash') {
+    if (activeModel === 'gemini') {
       if (type === 'gradient') return 'from-indigo-600 to-violet-700';
       return `${type}-indigo-${intensity}`;
     } else {
@@ -87,27 +87,27 @@ const Results: React.FC<ResultsProps> = ({ results, onRestart }) => {
       <div className="flex justify-center mb-6">
         <div className="bg-slate-100 p-1.5 rounded-xl inline-flex shadow-inner gap-1 w-full md:w-auto">
           <button
-            onClick={() => setActiveModel('flash')}
+            onClick={() => setActiveModel('gemini')}
             className={`flex-1 md:flex-none px-6 py-3 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
-              activeModel === 'flash' 
+              activeModel === 'gemini' 
                 ? 'bg-white text-indigo-600 shadow-md ring-1 ring-black/5' 
                 : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
             }`}
           >
             <Zap className="w-4 h-4" />
-            Gemini Flash
+            Gemini Pro
             <span className="hidden md:inline text-xs font-normal opacity-75 ml-1">(ผู้ช่วยแนะแนว)</span>
           </button>
           <button
-            onClick={() => setActiveModel('pro')}
+            onClick={() => setActiveModel('openai')}
             className={`flex-1 md:flex-none px-6 py-3 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
-              activeModel === 'pro'
+              activeModel === 'openai'
                 ? 'bg-white text-emerald-600 shadow-md ring-1 ring-black/5'
                 : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
             }`}
           >
             <Bot className="w-4 h-4" />
-            Gemini Pro (ChatGPT)
+            GPT-5 (OpenAI)
             <span className="hidden md:inline text-xs font-normal opacity-75 ml-1">(ที่ปรึกษาอาวุโส)</span>
           </button>
         </div>
@@ -185,11 +185,11 @@ const Results: React.FC<ResultsProps> = ({ results, onRestart }) => {
           {/* Reasoning */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
             <div className="flex items-center gap-3 mb-4">
-              <div className={`p-2 rounded-lg ${activeModel === 'flash' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'}`}>
+              <div className={`p-2 rounded-lg ${activeModel === 'gemini' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'}`}>
                 <BookOpen className="w-5 h-5" />
               </div>
               <h4 className="font-semibold text-slate-800">
-                มุมมองจาก {activeModel === 'flash' ? 'Gemini AI' : 'ChatGPT (Simulated)'}
+                มุมมองจาก {activeModel === 'gemini' ? 'Gemini Pro' : 'GPT-5 (OpenAI)'}
                 {activeContext === 'context' && <span className="text-sm font-normal text-slate-500 ml-2">(วิเคราะห์ร่วมกับรายวิชา)</span>}
               </h4>
             </div>
@@ -201,7 +201,7 @@ const Results: React.FC<ResultsProps> = ({ results, onRestart }) => {
           {/* Preparation Steps */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
             <div className="flex items-center gap-3 mb-4">
-              <div className={`p-2 rounded-lg ${activeModel === 'flash' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'}`}>
+              <div className={`p-2 rounded-lg ${activeModel === 'gemini' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'}`}>
                 <ListChecks className="w-5 h-5" />
               </div>
               <h4 className="font-semibold text-slate-800">สิ่งที่ต้องเตรียมตัว</h4>
@@ -210,7 +210,7 @@ const Results: React.FC<ResultsProps> = ({ results, onRestart }) => {
               {currentResult.preparationSteps.map((step, idx) => (
                 <li key={idx} className="flex gap-3 text-slate-600 text-sm md:text-base">
                   <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                    activeModel === 'flash' 
+                    activeModel === 'gemini' 
                       ? 'bg-indigo-100 text-indigo-600' 
                       : 'bg-emerald-100 text-emerald-600'
                   }`}>
@@ -225,22 +225,22 @@ const Results: React.FC<ResultsProps> = ({ results, onRestart }) => {
           {/* Roadmap */}
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
             <div className="flex items-center gap-3 mb-6">
-              <div className={`p-2 rounded-lg ${activeModel === 'flash' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'}`}>
+              <div className={`p-2 rounded-lg ${activeModel === 'gemini' ? 'bg-indigo-50 text-indigo-600' : 'bg-emerald-50 text-emerald-600'}`}>
                 <GraduationCap className="w-5 h-5" />
               </div>
               <h4 className="font-semibold text-slate-800">แผนการเรียนรู้ (Roadmap)</h4>
             </div>
             
-            <div className={`relative border-l-2 ml-3 space-y-8 ${activeModel === 'flash' ? 'border-indigo-100' : 'border-emerald-100'}`}>
+            <div className={`relative border-l-2 ml-3 space-y-8 ${activeModel === 'gemini' ? 'border-indigo-100' : 'border-emerald-100'}`}>
               {currentResult.roadmap.map((step, idx) => (
                 <div key={idx} className="pl-8 relative group">
                   <div className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 transition-colors ${
-                    activeModel === 'flash' 
+                    activeModel === 'gemini' 
                       ? 'border-indigo-400 group-hover:bg-indigo-600' 
                       : 'border-emerald-400 group-hover:bg-emerald-600'
                   }`} />
                   
-                  <h5 className={`font-semibold mb-1 ${activeModel === 'flash' ? 'text-indigo-900' : 'text-emerald-900'}`}>
+                  <h5 className={`font-semibold mb-1 ${activeModel === 'gemini' ? 'text-indigo-900' : 'text-emerald-900'}`}>
                     {step.phase}
                   </h5>
                   <p className="text-slate-600 text-sm mb-3">{step.description}</p>
@@ -254,7 +254,7 @@ const Results: React.FC<ResultsProps> = ({ results, onRestart }) => {
                           target="_blank"
                           rel="noopener noreferrer"
                           className={`flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs md:text-sm text-slate-600 font-medium transition-all group/link ${
-                            activeModel === 'flash' 
+                            activeModel === 'gemini' 
                               ? 'hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700' 
                               : 'hover:border-emerald-400 hover:bg-emerald-50 hover:text-emerald-700'
                           }`}

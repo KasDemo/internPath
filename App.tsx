@@ -16,11 +16,11 @@ export default function App() {
   
   // Store structured results for both models and both contexts
   const [results, setResults] = useState<{
-    flash: { pure: AssessmentResult | null; context: AssessmentResult | null };
-    pro: { pure: AssessmentResult | null; context: AssessmentResult | null };
-  }>({
-    flash: { pure: null, context: null },
-    pro: { pure: null, context: null }
+    openai: { pure: AssessmentResult | null; context: AssessmentResult | null };
+    gemini: { pure: AssessmentResult | null; context: AssessmentResult | null };
+  }>( {
+    openai: { pure: null, context: null },
+    gemini: { pure: null, context: null }
   });
 
   const handleStartQuiz = async () => {
@@ -41,31 +41,31 @@ export default function App() {
   const processResults = useCallback(async (userAnswers: Record<number, string>) => {
     setAppState('analyzing');
     setLoading(true);
-    setLoadingMessage('AI กำลังวิเคราะห์ข้อมูลทั้ง 4 มิติ (Flash/Pro x ปกติ/หลักสูตร)...');
+    setLoadingMessage('AI กำลังวิเคราะห์ข้อมูลทั้ง 4 มิติ (OpenAI/Gemini x ปกติ/หลักสูตร)...');
     
     try {
       // Execute 4 analyses in parallel to support the new UI structure
-      const [flashPure, flashContext, proPure, proContext] = await Promise.all([
-        // 1. Flash Pure
-        analyzeCareerPath(questions, userAnswers, undefined, 'flash'),
-        // 2. Flash + Context
-        analyzeCareerPath(questions, userAnswers, DEFAULT_SYLLABUS, 'flash'),
-        // 3. Pro Pure
-        analyzeCareerPath(questions, userAnswers, undefined, 'pro'),
-        // 4. Pro + Context
-        analyzeCareerPath(questions, userAnswers, DEFAULT_SYLLABUS, 'pro')
+      const [openaiPure, openaiContext, geminiPure, geminiContext] = await Promise.all([
+        // 1. OpenAI Pure
+        analyzeCareerPath(questions, userAnswers, undefined, 'openai'),
+        // 2. OpenAI + Context
+        analyzeCareerPath(questions, userAnswers, DEFAULT_SYLLABUS, 'openai'),
+        // 3. Gemini Pure
+        analyzeCareerPath(questions, userAnswers, undefined, 'gemini'),
+        // 4. Gemini + Context
+        analyzeCareerPath(questions, userAnswers, DEFAULT_SYLLABUS, 'gemini')
       ]);
 
       setResults({
-        flash: { pure: flashPure, context: flashContext },
-        pro: { pure: proPure, context: proContext }
+        openai: { pure: openaiPure, context: openaiContext },
+        gemini: { pure: geminiPure, context: geminiContext }
       });
 
       setAppState('results');
     } catch (error) {
       console.error(error);
       alert('การวิเคราะห์ล้มเหลว กรุณาลองใหม่อีกครั้ง');
-      setAppState('intro'); // Reset on critical failure
+      setAppState('intro');
     } finally {
       setLoading(false);
     }
@@ -80,8 +80,8 @@ export default function App() {
     setAppState('intro');
     setAnswers({});
     setResults({
-      flash: { pure: null, context: null },
-      pro: { pure: null, context: null }
+      openai: { pure: null, context: null },
+      gemini: { pure: null, context: null }
     });
     window.scrollTo(0, 0);
   };
