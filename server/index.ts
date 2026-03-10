@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import { analyzeWithOpenAI, analyzeWithGemini } from './analyzeService.ts';
 
 // Load .env.local
-dotenv.config({ path: '.env.local' });
+dotenv.config({ path: '.env' });
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
