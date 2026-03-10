@@ -13,8 +13,11 @@ const PORT = process.env.PORT || 3001;
 
 app.use(express.json({ limit: '10mb' }));
 
-// Auth credentials
-const VALID_USER = { id: 'student', password: 'UP_stundet' };
+// Auth credentials from env
+const VALID_USER = {
+  id: process.env.LOGIN_ID || 'student',
+  password: process.env.LOGIN_PASSWORD || 'UP_Student'
+};
 
 // Simple token (base64 of id:password:timestamp)
 const generateToken = (userId: string) => {
