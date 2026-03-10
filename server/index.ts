@@ -13,8 +13,41 @@ const PORT = process.env.PORT || 3001;
 
 app.use(express.json({ limit: '10mb' }));
 
+// Auth credentials
+const VALID_USER = { id: 'student', password: 'UP_stundet' };
+
+// Simple token (base64 of id:password:timestamp)
+const generateToken = (userId: string) => {
+  return Buffer.from(`${userId}:${Date.now()}`).toString('base64');
+};
+
+// Store active tokens in memory
+const activeTokens = new Set<string>();
+
+// Auth middleware
+const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  if (!token || !activeTokens.has(token)) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  next();
+};
+
+// Login endpoint
+app.post('/api/login', (req, res) => {
+  const { id, password } = req.body;
+  if (id === VALID_USER.id && password === VALID_USER.password) {
+    const token = generateToken(id);
+    activeTokens.add(token);
+    res.json({ token, user: id });
+  } else {
+    res.status(401).json({ error: 'รหัสผ่านไม่ถูกต้อง' });
+  }
+});
+
 // API Routes
-app.post('/api/analyze', async (req, res) => {
+app.post('/api/analyze', requireAuth, async (req, res) => {
   try {
     const { questions, answers, pdfContext, modelType } = req.body;
 

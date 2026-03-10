@@ -15,12 +15,16 @@ export const analyzeCareerPath = async (
   questions: Question[],
   answers: Record<number, string>,
   pdfContext?: string,
-  modelType: 'openai' | 'gemini' = 'gemini'
+  modelType: 'openai' | 'gemini' = 'gemini',
+  token?: string
 ): Promise<AssessmentResult> => {
   try {
     const response = await fetch('/api/analyze', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
       body: JSON.stringify({ questions, answers, pdfContext, modelType })
     });
 

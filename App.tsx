@@ -2,11 +2,13 @@ import React, { useState, useCallback } from 'react';
 import { AppState, Question, AssessmentResult } from './types';
 import { generateQuizQuestions, analyzeCareerPath } from './services/geminiService';
 import { DEFAULT_SYLLABUS } from './data/syllabus';
+import Login from './components/Login';
 import Quiz from './components/Quiz';
 import Results from './components/Results';
-import { BrainCircuit, Loader2 } from 'lucide-react';
+import { BrainCircuit, Loader2, LogOut } from 'lucide-react';
 
 export default function App() {
+  const [token, setToken] = useState<string | null>(sessionStorage.getItem('token'));
   const [appState, setAppState] = useState<AppState>('intro');
   const [loading, setLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
@@ -47,13 +49,13 @@ export default function App() {
       // Execute 4 analyses in parallel to support the new UI structure
       const [openaiPure, openaiContext, geminiPure, geminiContext] = await Promise.all([
         // 1. OpenAI Pure
-        analyzeCareerPath(questions, userAnswers, undefined, 'openai'),
+        analyzeCareerPath(questions, userAnswers, undefined, 'openai', token!),
         // 2. OpenAI + Context
-        analyzeCareerPath(questions, userAnswers, DEFAULT_SYLLABUS, 'openai'),
+        analyzeCareerPath(questions, userAnswers, DEFAULT_SYLLABUS, 'openai', token!),
         // 3. Gemini Pure
-        analyzeCareerPath(questions, userAnswers, undefined, 'gemini'),
+        analyzeCareerPath(questions, userAnswers, undefined, 'gemini', token!),
         // 4. Gemini + Context
-        analyzeCareerPath(questions, userAnswers, DEFAULT_SYLLABUS, 'gemini')
+        analyzeCareerPath(questions, userAnswers, DEFAULT_SYLLABUS, 'gemini', token!)
       ]);
 
       setResults({
@@ -86,6 +88,20 @@ export default function App() {
     window.scrollTo(0, 0);
   };
 
+  const handleLogin = (newToken: string) => {
+    setToken(newToken);
+  };
+
+  const handleLogout = () => {
+    setToken(null);
+    sessionStorage.removeItem('token');
+    handleRestart();
+  };
+
+  if (!token) {
+    return <Login onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
       {/* Header */}
@@ -97,8 +113,17 @@ export default function App() {
             </div>
             <h1 className="font-bold text-xl text-slate-800 tracking-tight">InternPath <span className="text-indigo-600">AI</span></h1>
           </div>
-          <div className="text-sm font-medium text-slate-500 hidden md:block">
-            สำหรับนักศึกษา Software Engineering
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-medium text-slate-500 hidden md:block">
+              สำหรับนักศึกษา Software Engineering
+            </span>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-red-500 transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              ออกจากระบบ
+            </button>
           </div>
         </div>
       </header>
